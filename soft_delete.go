@@ -1,4 +1,4 @@
-package db
+package soft_delete
 
 import (
 	"gorm.io/gorm"
