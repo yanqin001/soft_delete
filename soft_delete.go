@@ -1,4 +1,4 @@
-package component
+package soft_delete
 
 import (
 	"database/sql/driver"
