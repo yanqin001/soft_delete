@@ -1,6 +1,8 @@
-package soft_delete
+package component
 
 import (
+	"database/sql/driver"
+	"errors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -16,6 +18,30 @@ var (
 
 func (DeletedAt) QueryClauses(f *schema.Field) []clause.Interface {
 	return []clause.Interface{SoftDeleteQueryClause{Field: f}}
+}
+
+// 实现 driver.Valuer 接口，将 BoolType 转换为数据库中的值
+func (b DeletedAt) Value() (driver.Value, error) {
+	if b {
+		return true, nil
+	}
+	return false, nil
+}
+
+// 实现 sql.Scanner 接口，从数据库中的值将其转换为 BoolType
+func (b *DeletedAt) Scan(value interface{}) error {
+	boolVal, ok := value.(bool)
+	if !ok {
+		return errors.New("Invalid data type for DeletedAt")
+	}
+
+	if boolVal {
+		*b = true
+	} else {
+		*b = false
+	}
+
+	return nil
 }
 
 type SoftDeleteQueryClause struct {
